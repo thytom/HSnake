@@ -25,7 +25,10 @@ source-repository head
 
 library
   exposed-modules:
+      Direction
       HSnake
+      Node
+      Snake
   other-modules:
       Paths_HSnake
   hs-source-dirs:
