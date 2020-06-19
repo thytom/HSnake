@@ -13,7 +13,7 @@ import UI.HSCurses.Curses
 
 gameOver = False
 
-fps = 25
+fps = 30
 
 game :: IO ()
 game = do
@@ -25,18 +25,20 @@ game = do
   echo False
   (termX, termY) <- scrSize
   let sn = snake (termY `div` 2) (termX `div` 2) D.Right 10
-  apple <- (newApple (termX, termY) sn)
-  play (KeyUnknown 0) stdScr apple sn
+  apple <- newApple (termX, termY) sn
+  score <- play (KeyUnknown 0) stdScr apple sn 0
   endWin
+  putStrLn $ "Game over! Final Score: " ++ (show score)
 
-play :: Key -> Window -> Apple -> Snake -> IO ()
-play k scr ap (d1, sn) =
+play :: Key -> Window -> Apple -> Snake -> Int -> IO (Int)
+play k scr ap (d1, sn) score =
   if gameOver || k == KeyChar 'q'
-    then return ()
+    then return score
     else do
       bounds <- scrSize
       let newSnake = wrap (moveSnake (d1, sn) newDirection) bounds
-      nextapp <- if nodesCollide ap (head sn)
+      let col = nodesCollide ap (head sn)
+      nextapp <- if col
          then do
             newapple <- newApple bounds newSnake
             drawNode '@' scr newapple
@@ -44,10 +46,11 @@ play k scr ap (d1, sn) =
          else do
             drawNode '@' scr ap
             return ap
+      let newscore = if col then score + 1 else score
       drawSnake newSnake scr '#'
       threadDelay $ 1000000 `div` fps
       input <- getch
-      play (decodeKey input) scr nextapp newSnake
+      play (decodeKey input) scr nextapp newSnake newscore
   where
     newDirection =
       case k of
@@ -56,6 +59,12 @@ play k scr ap (d1, sn) =
         KeyChar 'a' -> D.Left
         KeyChar 'd' -> D.Right
         _ -> d1
+
+render :: Snake -> Apple -> Window -> IO ()
+render s a scr= do
+  drawSnake s scr '#'
+  drawNode '@' scr a
+
 
 drawNode :: Char -> Window -> Node -> IO ()
 drawNode ch scr = \(x, y) -> mvWAddStr scr y x (ch : [])
