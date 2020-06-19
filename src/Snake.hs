@@ -16,6 +16,17 @@ invalidMoves =
 validMove :: Direction -> Direction -> Bool
 validMove d1 d2 = all (/= (d1, d2)) invalidMoves
 
+wrap :: Snake -> (Int, Int) -> Snake
+wrap (d1, sn) (h, w) = (d1, (fixY $ fixX $ head sn) : tail sn)
+  where fixX (x, y)
+          | x < 0 = (w - 1, y)
+          | x >= w = (0, y)
+          | otherwise = (x, y)
+        fixY (x, y)
+          | y < 0 = (x, h - 1)
+          | y >= h = (x, 0)
+          | otherwise = (x, y)
+
 moveSnake :: Snake -> Direction -> Snake
 moveSnake (d1, orig) d2
   | validMove d1 d2 = (d2, newhead : newtail)
@@ -28,4 +39,6 @@ growSnake :: Snake -> Int -> Snake
 growSnake (d1, orig) amt = (d1, orig ++ [(0, 0) | _ <- [1..amt]])
 
 snake :: Int -> Int -> Direction -> Int -> Snake
-snake x y dir len = undefined
+snake x y dir len = (dir, body)
+  where body = [applyVector (x, y) (a*(-n), b*(-n)) | n <- [0..len]]
+        (a, b) = asNodeVector dir

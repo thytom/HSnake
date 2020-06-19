@@ -7,7 +7,7 @@ data Direction
   | Down
   | Left
   | Right
-  deriving (Eq)
+  deriving (Eq, Show)
 
 asNodeVector :: Direction -> Node
 asNodeVector Direction.Up     = ( 0, -1)
