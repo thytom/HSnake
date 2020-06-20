@@ -24,7 +24,7 @@ game = do
   cursSet CursorInvisible
   echo False
   (termX, termY) <- scrSize
-  let sn = snake (termY `div` 2) (termX `div` 2) D.Right 10
+  let sn = snake (termY `div` 2) (termX `div` 2) D.Right 5
   apple <- newApple (termX, termY) sn
   score <- play (KeyUnknown 0) stdScr apple sn 0
   endWin
