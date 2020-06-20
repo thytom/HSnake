@@ -40,5 +40,5 @@ growSnake amt (d1, orig) = (d1, orig ++ [(0, 0) | _ <- [1..amt]])
 
 snake :: Int -> Int -> Direction -> Int -> Snake
 snake x y dir len = (dir, body)
-  where body = [applyVector (x, y) (a*(-n), b*(-n)) | n <- [0..len]]
+  where body = [applyVector (x, y) (a*(-n), b*(-n)) | n <- [0..len + 1]]
         (a, b) = asNodeVector dir
