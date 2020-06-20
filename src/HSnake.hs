@@ -37,6 +37,7 @@ play k scr ap (d1, sn) score =
     else do
       bounds <- scrSize
       let col = nodesCollide ap (head sn)
+      let colSnake = nodeCollidesWithAny (head sn) (tail sn)
       let newsnake =
             if col
               then do
@@ -57,7 +58,9 @@ play k scr ap (d1, sn) score =
       drawNode '@' scr nextapp
       threadDelay $ 1000000 `div` fps
       input <- getch
-      play (decodeKey input) scr nextapp newsnake newscore
+      if colSnake 
+         then return score
+         else play (decodeKey input) scr nextapp newsnake newscore
   where
     newDirection =
       case k of
