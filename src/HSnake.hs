@@ -19,7 +19,7 @@ game :: IO ()
 game = do
   initScr
   initCurses
-  timeout 1
+  timeout 0
   cBreak True
   cursSet CursorInvisible
   echo False
@@ -36,21 +36,28 @@ play k scr ap (d1, sn) score =
     then return score
     else do
       bounds <- scrSize
-      let newSnake = wrap (moveSnake (d1, sn) newDirection) bounds
       let col = nodesCollide ap (head sn)
-      nextapp <- if col
-         then do
-            newapple <- newApple bounds newSnake
-            drawNode '@' scr newapple
-            return newapple
-         else do
-            drawNode '@' scr ap
+      let newsnake =
+            if col
+              then do
+                growSnake 1 $ mv bounds
+              else do
+                mv bounds
+      nextapp <-
+        if col
+          then do
+            newApple bounds newsnake
+          else do 
             return ap
-      let newscore = if col then score + 1 else score
-      drawSnake newSnake scr '#'
+      let newscore =
+            if col
+              then score + 1
+              else score
+      drawSnake newsnake scr '#'
+      drawNode '@' scr nextapp
       threadDelay $ 1000000 `div` fps
       input <- getch
-      play (decodeKey input) scr nextapp newSnake newscore
+      play (decodeKey input) scr nextapp newsnake newscore
   where
     newDirection =
       case k of
@@ -59,12 +66,12 @@ play k scr ap (d1, sn) score =
         KeyChar 'a' -> D.Left
         KeyChar 'd' -> D.Right
         _ -> d1
+    mv b = wrap (moveSnake (d1, sn) newDirection) b
 
 render :: Snake -> Apple -> Window -> IO ()
-render s a scr= do
+render s a scr = do
   drawSnake s scr '#'
   drawNode '@' scr a
-
 
 drawNode :: Char -> Window -> Node -> IO ()
 drawNode ch scr = \(x, y) -> mvWAddStr scr y x (ch : [])

@@ -35,8 +35,8 @@ moveSnake (d1, orig) d2
     newhead = applyVector (asNodeVector d2) $ head orig
     newtail = reverse $ tail $ reverse orig
 
-growSnake :: Snake -> Int -> Snake
-growSnake (d1, orig) amt = (d1, orig ++ [(0, 0) | _ <- [1..amt]])
+growSnake :: Int -> Snake -> Snake
+growSnake amt (d1, orig) = (d1, orig ++ [(0, 0) | _ <- [1..amt]])
 
 snake :: Int -> Int -> Direction -> Int -> Snake
 snake x y dir len = (dir, body)
